@@ -1,0 +1,5 @@
+questions with gold evidence: 47  (k=6, text queries)
+mean recall@k      : 0.968
+all-gold-found rate: 0.936
+MRR (first gold)   : 0.798
+hard-negative hit  : 0.064

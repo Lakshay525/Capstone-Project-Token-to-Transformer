@@ -1,0 +1,7 @@
+anthropic>=0.40        # LLM_PROVIDER=anthropic (default when ANTHROPIC_API_KEY is set)
+openai>=1.40           # LLM_PROVIDER=openai: OpenAI, Gemini, Groq, OpenRouter, Ollama (OpenAI-compatible)
+gnani-vachana>=0.8.2   # Gnani STT + TTS (the only speech service allowed)
+# optional: dense retrieval fused with BM25 (set EMBED_MODEL in .env)
+# sentence-transformers
+# dev
+pytest
