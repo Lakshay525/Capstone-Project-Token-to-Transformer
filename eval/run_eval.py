@@ -54,7 +54,7 @@ def _tag(args):
 def run_questions(args, llm, retriever):
     rows = read("questions.csv")
     prior = _prior(args, lambda r: r["id"])
-    unanswerable_ids = {r["id"] for r in rows if r["answerable"] == "True" and not r["gold_evidence"]}
+    unanswerable_ids = {r["id"] for r in rows if r["answerable"] == "False" or not r["gold_evidence"]}
 
     def one(row):
         if row["id"] in prior:

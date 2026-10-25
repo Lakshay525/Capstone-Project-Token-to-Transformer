@@ -3,14 +3,14 @@
     "mode": "rag",
     "asr": false,
     "n": 52,
-    "errors": 9,
-    "correct": 30,
-    "accuracy": 0.577,
-    "must_include_rate": 0.744,
+    "errors": 0,
+    "correct": 38,
+    "accuracy": 0.731,
+    "must_include_rate": 0.769,
     "must_not_clean_rate": 1.0,
-    "decision_rate": 0.953,
-    "mean_evidence_recall": 0.965,
-    "dont_know_questions_correct": "0/0"
+    "decision_rate": 0.942,
+    "mean_evidence_recall": 0.971,
+    "dont_know_questions_correct": "5/5"
   },
   "results": [
     {
@@ -40,8 +40,29 @@
     },
     {
       "id": "PQ0003",
-      "error": "LLM call failed: Error code: 429 - {'error': {'message': 'Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01m5q7ma6xe8aa81e1qevmbqy0` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 7298, Requested 2066. Please try again in 10.23s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing', 'type': 'tokens', 'code': 'rate_limit_exceeded'}}",
-      "correct": false
+      "question": "How fast are refunds to the ZentroMart Wallet?",
+      "reply": "I'm ZentroMart's AI support assistant. Refunds to the ZentroMart Wallet are instant, within 2 hours.",
+      "decision": "answer",
+      "expected": "answer",
+      "must_include": true,
+      "must_not": true,
+      "decision_ok": true,
+      "correct": true,
+      "chunks": [
+        "REF-2",
+        "PAY-4",
+        "REF-3",
+        "MKS-2",
+        "PAY-1",
+        "FAQ-1",
+        "RET-2",
+        "KB-00.1",
+        "products.csv:BKS-0058",
+        "products.csv:ELE-0010"
+      ],
+      "evidence_recall": 1.0,
+      "no_document_answer": false,
+      "language": "en"
     },
     {
       "id": "PQ0004",
@@ -211,8 +232,28 @@
     },
     {
       "id": "PQ0014",
-      "error": "LLM call failed: Error code: 429 - {'error': {'message': 'Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01m5q7ma6xe8aa81e1qevmbqy0` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6873, Requested 2394. Please try again in 9.5025s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing', 'type': 'tokens', 'code': 'rate_limit_exceeded'}}",
-      "correct": false
+      "question": "मुझे Pagecraft A5 Ruled Notebook (Pack of 4) लौटाने के लिए कितने दिन मिलेंगे?",
+      "reply": "मैं ZentroMart का AI सपोर्ट असिस्टेंट हूँ। आपको डिलीवरी की तारीख से 10 कैलेंडर दिन मिलेंगे।",
+      "decision": "answer",
+      "expected": "answer",
+      "must_include": true,
+      "must_not": true,
+      "decision_ok": true,
+      "correct": true,
+      "chunks": [
+        "RET-2",
+        "FAQH-2",
+        "ESC-1",
+        "DWM-4",
+        "FAQH-3",
+        "RETv3-2",
+        "KB-00.1",
+        "products.csv:BKS-0056",
+        "products.csv:BKS-0058"
+      ],
+      "evidence_recall": 1.0,
+      "no_document_answer": false,
+      "language": "hi"
     },
     {
       "id": "PQ0015",
@@ -313,8 +354,30 @@
     },
     {
       "id": "PQ0020",
-      "error": "LLM call failed: Error code: 429 - {'error': {'message': 'Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01m5q7ma6xe8aa81e1qevmbqy0` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 7610, Requested 2523. Please try again in 15.9975s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing', 'type': 'tokens', 'code': 'rate_limit_exceeded'}}",
-      "correct": false
+      "question": "मुझे Sootra Canvas Tote Bag लौटाने के लिए कितने दिन मिलेंगे?",
+      "reply": "मैं ZentroMart का AI सपोर्ट असिस्टेंट हूँ। आपके Sootra Canvas Tote Bag को डिलीवरी के 15 दिन के भीतर लौटाया जा सकता है।",
+      "decision": "answer",
+      "expected": "answer",
+      "must_include": true,
+      "must_not": true,
+      "decision_ok": true,
+      "correct": true,
+      "chunks": [
+        "RET-2",
+        "FAQH-2",
+        "FAQH-3",
+        "RETv3-2",
+        "RET-3",
+        "ESC-1",
+        "RET-8",
+        "RET-6",
+        "KB-00.1",
+        "products.csv:FSH-0037",
+        "products.csv:FSH-0038"
+      ],
+      "evidence_recall": 1.0,
+      "no_document_answer": false,
+      "language": "hi"
     },
     {
       "id": "PQ0021",
@@ -532,13 +595,61 @@
     },
     {
       "id": "PQ0030",
-      "error": "LLM call failed: Error code: 429 - {'error': {'message': 'Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01m5q7ma6xe8aa81e1qevmbqy0` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6765, Requested 3104. Please try again in 14.0175s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing', 'type': 'tokens', 'code': 'rate_limit_exceeded'}}",
-      "correct": false
+      "question": "The Kestrel Book 14 Laptop (SKU ELE-0023) I received yesterday has a crack. I want it sorted.",
+      "reply": "I'm ZentroMart's AI support assistant. I’m forwarding your case to our Priority Resolution team. They’ll handle the claim for the cracked laptop.",
+      "decision": "escalate",
+      "expected": "escalate",
+      "must_include": true,
+      "must_not": true,
+      "decision_ok": true,
+      "correct": true,
+      "chunks": [
+        "DWM-1",
+        "TRK-2",
+        "DWM-4",
+        "RET-6",
+        "REF-5",
+        "RET-5",
+        "RET-2",
+        "RET-3",
+        "WAR-1",
+        "DWM-3",
+        "ESC-1",
+        "KB-00.1",
+        "products.csv:ELE-0023",
+        "products.csv:ELE-0022"
+      ],
+      "evidence_recall": 1.0,
+      "no_document_answer": false,
+      "language": "en"
     },
     {
       "id": "PQ0031",
-      "error": "LLM call failed: Error code: 429 - {'error': {'message': 'Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01m5q7ma6xe8aa81e1qevmbqy0` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 5402, Requested 2781. Please try again in 1.3725s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing', 'type': 'tokens', 'code': 'rate_limit_exceeded'}}",
-      "correct": false
+      "question": "My Bluetooth speaker won't turn on at all.",
+      "reply": "I'm ZentroMart's AI support assistant. Sure, let’s try a quick fix. First, charge the speaker for at least 30 minutes using the original cable. Then hold the power button for 10 seconds to force a restart. If it still won’t power on, you can return it within the return window or claim the warranty.",
+      "decision": "answer",
+      "expected": "answer",
+      "must_include": true,
+      "must_not": true,
+      "decision_ok": true,
+      "correct": true,
+      "chunks": [
+        "TRB-4",
+        "TRB-3",
+        "KB-00.2",
+        "RETv3-6",
+        "TRB-2",
+        "RET-8",
+        "RET-2",
+        "RET-3",
+        "WAR-1",
+        "KB-00.1",
+        "products.csv:ELE-0019",
+        "products.csv:ELE-0018"
+      ],
+      "evidence_recall": 1.0,
+      "no_document_answer": false,
+      "language": "en"
     },
     {
       "id": "PQ0032",
@@ -729,8 +840,30 @@
     },
     {
       "id": "PQ0041",
-      "error": "LLM call failed: Error code: 429 - {'error': {'message': 'Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01m5q7ma6xe8aa81e1qevmbqy0` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 5427, Requested 2598. Please try again in 187.5ms. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing', 'type': 'tokens', 'code': 'rate_limit_exceeded'}}",
-      "correct": false
+      "question": "What warranty comes with the Nimbus X2 Pro Wireless Earbuds, Blue (SKU ELE-0003)?",
+      "reply": "I'm ZentroMart's AI support assistant. The Nimbus X2 Pro Wireless Earbuds, Blue (SKU ELE-0003) come with a 12‑month ZentroMart Assured warranty from the delivery date, plus the manufacturer’s 12‑month warranty.",
+      "decision": "answer",
+      "expected": "answer",
+      "must_include": true,
+      "must_not": true,
+      "decision_ok": true,
+      "correct": true,
+      "chunks": [
+        "MKS-3",
+        "WAR-2",
+        "WAR-1",
+        "TRB-1",
+        "DWM-4",
+        "WAR-3",
+        "RET-2",
+        "RET-3",
+        "KB-00.1",
+        "products.csv:ELE-0003",
+        "products.csv:ELE-0001"
+      ],
+      "evidence_recall": 1.0,
+      "no_document_answer": false,
+      "language": "en"
     },
     {
       "id": "PQ0042",
@@ -782,13 +915,58 @@
     },
     {
       "id": "PQ0045",
-      "error": "LLM call failed: Error code: 429 - {'error': {'message': 'Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01m5q7ma6xe8aa81e1qevmbqy0` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 7729, Requested 2422. Please try again in 16.1325s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing', 'type': 'tokens', 'code': 'rate_limit_exceeded'}}",
-      "correct": false
+      "question": "How long does a refund to UPI take?",
+      "reply": "I'm ZentroMart's AI support assistant. Refunds to UPI usually take 1 to 3 business days.",
+      "decision": "answer",
+      "expected": "answer",
+      "must_include": true,
+      "must_not": true,
+      "decision_ok": true,
+      "correct": true,
+      "chunks": [
+        "REF-2",
+        "FAQ-1",
+        "REF-3",
+        "PAY-1",
+        "ESC-1",
+        "PLS-3",
+        "RET-2",
+        "KB-00.1",
+        "products.csv:BKS-0058"
+      ],
+      "evidence_recall": 1.0,
+      "no_document_answer": false,
+      "language": "en"
     },
     {
       "id": "PQ0046",
-      "error": "LLM call failed: Error code: 429 - {'error': {'message': 'Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01m5q7ma6xe8aa81e1qevmbqy0` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 5942, Requested 2798. Please try again in 5.55s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing', 'type': 'tokens', 'code': 'rate_limit_exceeded'}}",
-      "correct": false
+      "question": "The Kestrel Book 14 Laptop (SKU ELE-0022) I received yesterday has a crack. I want it sorted.",
+      "reply": "I'm ZentroMart's AI support assistant. I’m creating a ticket for you. A human agent will reach out shortly to help resolve the cracked laptop.",
+      "decision": "escalate",
+      "expected": "escalate",
+      "must_include": true,
+      "must_not": true,
+      "decision_ok": true,
+      "correct": true,
+      "chunks": [
+        "DWM-1",
+        "TRK-2",
+        "DWM-4",
+        "RET-6",
+        "REF-5",
+        "RET-5",
+        "RET-2",
+        "RET-3",
+        "WAR-1",
+        "DWM-3",
+        "ESC-1",
+        "KB-00.1",
+        "products.csv:ELE-0022",
+        "products.csv:ELE-0023"
+      ],
+      "evidence_recall": 1.0,
+      "no_document_answer": false,
+      "language": "en"
     },
     {
       "id": "PQ0047",
@@ -956,8 +1134,29 @@
     },
     {
       "id": "PQ0054",
-      "error": "LLM call failed: Error code: 429 - {'error': {'message': 'Rate limit reached for model `openai/gpt-oss-120b` in organization `org_01m5q7ma6xe8aa81e1qevmbqy0` service tier `on_demand` on tokens per minute (TPM): Limit 8000, Used 6245, Requested 2405. Please try again in 4.875s. Need more tokens? Upgrade to Dev Tier today at https://console.groq.com/settings/billing', 'type': 'tokens', 'code': 'rate_limit_exceeded'}}",
-      "correct": false
+      "question": "Sale mein 10 October ko order kiya tha (UrbanThread Slim Fit Jeans), return ke kitne din hain?",
+      "reply": "Main ZentroMart ka AI support assistant hoon. कृपया बताइए कि आपका ऑर्डर कब डिलीवर हुआ था?",
+      "decision": "clarify",
+      "expected": "answer",
+      "must_include": false,
+      "must_not": true,
+      "decision_ok": false,
+      "correct": false,
+      "chunks": [
+        "RET-8",
+        "RET-2",
+        "RETv3-2",
+        "RET-3",
+        "KB-00.3",
+        "FAQ-1",
+        "RET-6",
+        "KB-00.1",
+        "products.csv:FSH-0029",
+        "products.csv:FSH-0030"
+      ],
+      "evidence_recall": 1.0,
+      "no_document_answer": false,
+      "language": "hi-en"
     },
     {
       "id": "PQ0056",

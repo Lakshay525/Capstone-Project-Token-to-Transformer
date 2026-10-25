@@ -16,11 +16,30 @@ ROOT = Path(__file__).resolve().parent.parent
 RES = ROOT / "eval" / "results"
 
 NARRATIVE = {
-    "went_wrong": ("Fill in after running the evaluation: list the failing practice cases from "
-                   "eval/results/*.json (the runner prints them) and the cause of each."),
-    "fix_next": ("Fill in: what you would change first (retrieval misses, Hindi phrasing, voice latency, ...)."),
-    "bonus": ("Hybrid BM25 + optional multilingual dense retrieval; code-enforced verification and date arithmetic; "
-              "spoken-digit normalisation for ASR text; scripted-LLM offline tests; web demo with browser recording."),
+    "went_wrong": (
+        "<b>Evaluation limits (please read).</b> I used Groq's free tier (gpt-oss-120b, 200,000 tokens/day). When it ran "
+        "out, calls rotated to gpt-oss-20b and qwen3.8-27b, and --resume merged runs made on different days, so the "
+        "Step 2 and Step 3 rows mix models and two prompt versions. The Step 1 row used gpt-oss-120b only. 3 Step 1 "
+        "and 3 full-agent questions errored (rate limit / malformed tool call) and count as wrong. The quota ran out "
+        "before I could run the 23-conversation evaluation, so Step 3 conversation handling is <b>not scored</b>, and my "
+        "end-to-end voice batch got only quota-error apologies from the LLM (Gnani STT/TTS themselves worked: my clips "
+        "were transcribed and replies were synthesised).<br>"
+        "<b>Step 1.</b> Without documents the model guesses: 14% of required facts present, and 0 of 5 questions the "
+        "documents do not cover were answered with 'I don't know'. Step 2 got 5 of 5.<br>"
+        "<b>Step 2 failures (14).</b> 6 wrong refund deadlines: the LLM miscounts business days (Sundays and the 19 "
+        "October holiday). 3 warranty answers omitted the 12-month period. Hinglish questions answered in Devanagari. "
+        "'Clarify' chosen after already answering. Swimsuit/briefs not stated as 'cannot be returned'.<br>"
+        "<b>Full agent on single questions (14 wrong, 3 errors).</b> Date maths fixed by the refund_eta tool, but new "
+        "problems: wrong decision label on escalation/safety questions (PQ0023, PQ0030, PQ0031), and 2 questions failed "
+        "because the model sent null for an optional tool argument."),
+    "fix_next": (
+        "Fixed in code after those runs but <b>not re-scored</b> (quota): null tool arguments are tolerated; the "
+        "'I am an AI assistant' opening is enforced in code; empty replies are retried; retry-after is honoured. Next "
+        "(in order): re-run all evaluations on one model with a larger quota; tighten escalation prompts for "
+        "safety/unauthorised-activity cases; add multilingual embeddings for Hindi; shorten prompts to cut tokens per call."),
+    "bonus": ("Hybrid BM25 + optional multilingual dense retrieval; query bridge for Hinglish; catalog-to-policy joins; "
+              "code-enforced identity check with one retry and ticket honesty; spoken-digit normalisation for ASR text; "
+              "offline tests with a scripted LLM (9 passing); resumable evaluation runner; browser demo with microphone recording."),
 }
 
 
@@ -38,7 +57,7 @@ def row(label, s, keys):
 def main():
     retr = subprocess.run([sys.executable, "-X", "utf8", str(ROOT / "eval" / "retrieval_eval.py"), "--k", "6"],
                           capture_output=True, text=True, encoding="utf-8").stdout.strip().replace("\n", "<br>")
-    keys = ["accuracy", "must_include_rate", "decision_rate", "mean_evidence_recall", "dont_know_questions_correct"]
+    keys = ["correct", "accuracy", "errors", "must_include_rate", "decision_rate", "mean_evidence_recall", "dont_know_questions_correct"]
     q1, q2, q3 = load("questions_baseline"), load("questions_rag"), load("questions_full")
     qa, cv = load("questions_rag_asr"), load("conversations_full")
     ckeys = ["turn_accuracy", "conversations_fully_correct", "decision_rate", "tool_call_rate", "must_include_rate"]
@@ -56,7 +75,7 @@ create_ticket returned created=True.<br>
 reply text, batch runner (run.py) and a browser demo (app.py).</p>
 <h2>Step 1 vs Step 2 (practice questions, 52)</h2>
 <table border=1 cellpadding=3 cellspacing=0>
-<tr><th>run</th><th>accuracy</th><th>facts included</th><th>decision ok</th><th>evidence recall</th><th>"don't know" cases</th></tr>
+<tr><th>run</th><th>correct /52</th><th>accuracy</th><th>errors (rate limit)</th><th>facts included</th><th>decision ok</th><th>evidence recall</th><th>"I don't know" cases</th></tr>
 {row("Step 1: prompt only", q1, keys)}{row("Step 2: RAG", q2, keys)}{row("Step 3 agent, single questions", q3, keys)}
 {row("Step 2 on ASR-style text", qa, keys)}
 </table>

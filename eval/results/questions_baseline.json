@@ -10,7 +10,7 @@
     "must_not_clean_rate": 1.0,
     "decision_rate": 0.327,
     "mean_evidence_recall": 0.102,
-    "dont_know_questions_correct": "0/0"
+    "dont_know_questions_correct": "0/5"
   },
   "results": [
     {

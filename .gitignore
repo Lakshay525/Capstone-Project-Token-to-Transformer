@@ -7,3 +7,7 @@ outputs/
 Capstone_Project_Dataset_FTTT_2026/
 *.zip
 .pytest_cache/
+my_clips/
+demo/
+demo.mp4
+*.mp4

@@ -10,6 +10,8 @@ customer audio -> Gnani STT -> agent (LLM + RAG + tools) -> Gnani TTS -> spoken 
 Speech is **Gnani only** (STT and TTS). The LLM, retrieval and framework are mine: plain Python, a pure-Python
 BM25 index, and either Anthropic or any OpenAI-compatible endpoint.
 
+**Repository:** https://github.com/Lakshay525/Capstone-Project-Token-to-Transformer
+
 ## Setup
 
 ```bash
@@ -96,6 +98,24 @@ eval/   retrieval_eval run_eval checks make_report
 tests/  offline tests (scripted fake LLM, no keys)
 sample_outputs/                        example outputs (see its README)
 ```
+
+## Evaluation status (honest summary)
+
+52 practice questions, free-tier Groq. **Caveat:** when `gpt-oss-120b` hit its daily token cap, calls rotated to
+`gpt-oss-20b` and `qwen3.8-27b`, and `--resume` merged runs from different days, so the Step 2 and full-agent rows mix
+models and two prompt versions. The Step 1 row is `gpt-oss-120b` only.
+
+| run | correct | errors | "I don't know" cases (5) |
+| --- | --- | --- | --- |
+| Step 1, prompt only | 5 / 52 | 3 (rate limit) | 0 / 5 |
+| Step 2, RAG | **38 / 52** | 0 | 5 / 5 |
+| Step 3 agent on single questions | 38 / 52 | 3 (rate limit, malformed tool call) | 4 / 5 |
+| retrieval only, no LLM (k=6) | recall 0.97, all-gold-found 0.94 | n/a | n/a |
+
+Not completed (free daily quota ran out): the 23-conversation evaluation and a clean end-to-end voice run (Gnani STT and
+TTS themselves worked on recorded clips). Fixes made after these runs (null tool arguments tolerated, AI-assistant opening
+enforced in code, empty-reply retry) are **not re-scored**. See `report.pdf` for the failure analysis. To finish:
+`python eval/run_eval.py conversations --resume` and `python eval/run_eval.py questions --mode full --resume`.
 
 ## Limits and honesty notes
 

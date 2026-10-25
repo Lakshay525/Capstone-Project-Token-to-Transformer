@@ -17,7 +17,8 @@ from . import dates
 from .config import TODAY
 from .kb import Retriever
 from .llm import LLM
-from .textutil import normalize_spoken
+from .textutil import normalize_spoken, script_of
+from .voice import hinglish_score
 
 import tools as zm_tools  # the dataset's mock tools (path added in config.py)
 
@@ -141,7 +142,7 @@ TOOL_SPECS = {
                        "verified order. Max one retry after a failed attempt.",
         "parameters": {"type": "object", "properties": {
             "order_id": {"type": "string", "description": "8-digit order ID, digits only"},
-            "verification_value": {"type": "string", "description": "what the caller said"}},
+            "verification_value": {"type": ["string", "null"], "description": "what the caller said"}},
             "required": ["order_id"]}},
     "create_ticket": {
         "name": "create_ticket",
@@ -170,8 +171,8 @@ TOOL_SPECS = {
                        "digital), applying the electronics-before-1-Aug and festive-sale rules.",
         "parameters": {"type": "object", "properties": {
             "return_category": {"type": "string"},
-            "delivered_on": {"type": "string", "description": "YYYY-MM-DD, if known"},
-            "placed_on": {"type": "string", "description": "order date YYYY-MM-DD, if known"}},
+            "delivered_on": {"type": ["string", "null"], "description": "YYYY-MM-DD, if known"},
+            "placed_on": {"type": ["string", "null"], "description": "order date YYYY-MM-DD, if known"}},
             "required": ["return_category"]}},
 }
 
@@ -208,6 +209,7 @@ class SupportAgent:
                           ("search_kb", "lookup_order", "create_ticket", "refund_eta", "return_window")]
         self._turn_chunks: list = []
         self._turn_calls: list = []
+        self._introduced = False       # STY-1: the first reply must say it is the AI assistant
 
     # ---- public --------------------------------------------------------------------
     def respond(self, user_text: str) -> Reply:
@@ -246,6 +248,13 @@ class SupportAgent:
             reply_text = ""
 
         decision, clean = self._parse(reply_text)
+        if not clean and not nudged_empty(self.messages):  # model returned nothing: ask once more
+            self.messages.append({"role": "user", "content": "[system note] Your reply was empty. Reply to the customer now."})
+            out = self.llm.complete(system, self.messages, None)
+            decision, clean = self._parse(out.text)
+            self.messages.append({"role": "assistant", "text": out.text, "tool_calls": []})
+        if self.mode != "baseline" and not self._introduced:
+            clean = self._with_intro(clean, text)
         if self.mode == "full" and decision == "escalate" and self.ticket_id == ticket_before:
             decision = "answer"  # ticket was not created: do not present it as a handover
             clean = clean or "Sorry, I could not create a ticket just now. Please try again in a moment."
@@ -262,6 +271,19 @@ class SupportAgent:
                      tool_calls=self._turn_calls, ticket_id=self.ticket_id if decision == "escalate" else None)
 
     # ---- helpers -------------------------------------------------------------------
+    def _with_intro(self, reply: str, user_text: str) -> str:
+        """STY-1 is a hard rule, so code guarantees it instead of trusting the model."""
+        self._introduced = True
+        if re.search(r"AI|artificial intelligence|एआई", reply or "", re.I):
+            return reply
+        if script_of(reply) == "devanagari" or (script_of(user_text) == "devanagari" and not reply):
+            intro = "मैं ZentroMart का AI सपोर्ट असिस्टेंट हूँ।"
+        elif hinglish_score(user_text) >= 2 and hinglish_score(reply) >= 1:
+            intro = "Main ZentroMart ka AI support assistant hoon."
+        else:
+            intro = "I'm ZentroMart's AI support assistant."
+        return f"{intro} {reply}".strip()
+
     @staticmethod
     def _parse(text: str):
         m = DECISION_RE.search(text or "")
@@ -311,6 +333,7 @@ class SupportAgent:
 
     # ---- tools ---------------------------------------------------------------------
     def _run_tool(self, name: str, args: dict) -> dict:
+        args = {k: v for k, v in (args or {}).items() if v is not None}  # models sometimes send null for optionals
         try:
             result = getattr(self, f"_tool_{name}")(**args)
         except TypeError as exc:
@@ -451,3 +474,8 @@ def _unit_price(order: dict, sku: str):
         if it["sku"] == sku:
             return it["unit_price_inr"]
     return None
+
+
+def nudged_empty(messages: list) -> bool:
+    return any(m["role"] == "user" and m["content"].startswith("[system note] Your reply was empty")
+               for m in messages)
