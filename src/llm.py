@@ -38,12 +38,19 @@ def _retry_delay(exc, attempt: int) -> float:
     return min(2 ** (attempt + 1), 60)
 
 
+def _is_daily_cap(exc) -> bool:
+    t = str(exc).lower()
+    return "per day" in t or "(tpd)" in t or "requests per day" in t or "daily" in t
+
+
 class LLM:
     def __init__(self, provider: str = None, model: str = None):
         self.provider = (provider or os.environ.get("LLM_PROVIDER")
                          or ("anthropic" if os.environ.get("ANTHROPIC_API_KEY") else "openai")).lower()
         default = "claude-sonnet-5-5" if self.provider == "anthropic" else "gpt-4o-mini"
         self.model = model or os.environ.get("LLM_MODEL") or default
+        # comma-separated models to rotate to when the current one hits its DAILY token cap
+        self.fallbacks = [m.strip() for m in os.environ.get("LLM_FALLBACK_MODELS", "").split(",") if m.strip()]
         self._client = None
 
     # ---- client ---------------------------------------------------------------------
@@ -73,6 +80,10 @@ class LLM:
                 raise
             except Exception as exc:
                 last = exc
+                if _is_daily_cap(exc) and self.fallbacks:  # waiting would take hours: switch model now
+                    self.model = self.fallbacks.pop(0)
+                    print(f"[llm] daily cap reached, switching to {self.model}", flush=True)
+                    continue
                 transient = any(s in f"{type(exc).__name__} {exc}".lower()
                                 for s in ("rate", "429", "overload", "timeout", "connection", "529", "503"))
                 if not transient:
@@ -128,6 +139,8 @@ class LLM:
             else:
                 msgs.append({"role": "tool", "tool_call_id": m["id"], "content": m["content"]})
         kwargs = dict(model=self.model, messages=msgs, max_tokens=max_tokens, temperature=0)
+        if "gpt-oss" in self.model:
+            kwargs["reasoning_effort"] = os.environ.get("LLM_REASONING_EFFORT", "low")
         if tools:
             kwargs["tools"] = [{"type": "function", "function": {
                 "name": t["name"], "description": t["description"], "parameters": t["parameters"]}}

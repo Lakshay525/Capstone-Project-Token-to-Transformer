@@ -139,9 +139,8 @@ class Chunk:
     tokens: list = field(default_factory=list, repr=False)
 
     def render(self) -> str:
-        flag = " [SUPERSEDED - applies only where its successor says so]" if self.status == "superseded" else ""
-        head = (f"[{self.id}] {self.title} (doc {self.doc_id}, {self.doc_type}, status {self.status}, "
-                f"effective_from {self.effective_from}){flag}")
+        flag = " SUPERSEDED (applies only where its successor says so)" if self.status == "superseded" else ""
+        head = f"[{self.id}] {self.title} ({self.doc_type}, {self.effective_from or 'catalog'}){flag}"
         return head + "\n" + self.text.strip()
 
 

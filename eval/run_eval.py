@@ -39,11 +39,26 @@ def _frac(rs, key):
     return round(sum(bool(r[key]) for r in rs) / max(len(rs), 1), 3)
 
 
+def _prior(args, key):
+    """Earlier error-free results (for --resume), keyed by question id or (conversation, turn)."""
+    p = OUT / f"{_tag(args)}.json"
+    if not args.resume or not p.exists():
+        return {}
+    return {key(r): r for r in json.loads(p.read_text(encoding="utf-8"))["results"] if "error" not in r}
+
+
+def _tag(args):
+    return f"{args.target}_{args.mode if args.target == 'questions' else 'full'}{'_asr' if args.asr else ''}"
+
+
 def run_questions(args, llm, retriever):
     rows = read("questions.csv")
+    prior = _prior(args, lambda r: r["id"])
     unanswerable_ids = {r["id"] for r in rows if r["answerable"] == "True" and not r["gold_evidence"]}
 
     def one(row):
+        if row["id"] in prior:
+            return prior[row["id"]]
         agent = SupportAgent(llm, retriever, args.mode, channel="voice" if args.asr else "chat")
         q = row["asr_text"] if args.asr else row["question"]
         try:
@@ -90,8 +105,12 @@ def run_conversations(args, llm, retriever):
     for r in rows:
         convs.setdefault(r["conversation_id"], []).append(r)
 
+    prior = _prior(args, lambda r: (r["conversation"], r["turn"]))
+
     def one(item):
         cid, turns = item
+        if all((cid, int(t["turn"])) in prior for t in turns):  # whole conversation already done
+            return [prior[(cid, int(t["turn"]))] for t in sorted(turns, key=lambda r: int(r["turn"]))]
         agent = SupportAgent(llm, retriever, "full", channel="voice" if args.asr else "chat")
         out = []
         for t in sorted(turns, key=lambda r: int(r["turn"])):
@@ -145,13 +164,15 @@ def main():
     ap.add_argument("target", choices=["questions", "conversations"])
     ap.add_argument("--mode", default="full", choices=["baseline", "rag", "full"])
     ap.add_argument("--asr", action="store_true", help="use the ASR-style text instead of the written question")
-    ap.add_argument("--workers", type=int, default=4)
+    ap.add_argument("--workers", type=int, default=2)
+    ap.add_argument("--resume", action="store_true",
+                    help="keep earlier results that have no error and only re-run the rest")
     args = ap.parse_args()
 
     llm, retriever = LLM(), Retriever()
     fn = run_questions if args.target == "questions" else run_conversations
     summary, res = fn(args, llm, retriever)
-    tag = f"{args.target}_{args.mode if args.target == 'questions' else 'full'}{'_asr' if args.asr else ''}"
+    tag = _tag(args)
     (OUT / f"{tag}.json").write_text(json.dumps({"summary": summary, "results": res}, ensure_ascii=False, indent=2),
                                      encoding="utf-8")
     print(json.dumps(summary, indent=2))
